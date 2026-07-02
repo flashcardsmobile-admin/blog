@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<title>Why Lisp?</title>
+<link rel=stylesheet href=https://unpkg.com/missing.css@1.3.0>
+
+<header><h1>Why Lisp?</h1></header>
+
+<main>
+<p>In most of my personal projects, I use the Common Lisp programming language.
+   This is often seen as an odd decision since Lisp has been around longer
+   than my parents have been alive. Surely it can't have anything to bring to
+   the table, right? Lisp in fact has three main advantages: a mature ecosystem, 
+   an arsenal of compilers, and unrivalled metaprogramming.
+<section>
+<header><h2>A Mature Ecosystem</h2></header>
+<p>Lisp may not have many developers, but it has had a half-century for its few
+   users to refine and perfect many useful libraries, some of which have no
+   parallels in other languages. To see the highlights of the modern Lisp
+   ecosystem, one only has to look at the
+   <a href=https://github.com/CodyReichert/awesome-cl>Awesome Common Lisp</a>
+   list. Within, you will see a variety of the normal libraries that one would
+   expect an ecosystem to have, web servers, CSV/YAML/TOML/&amp;c parsers,
+   Unit Testing frameworks, and so on.
+<p>Some may wonder why there are so many modern libraries when Lisp is a niche
+   language. I hypothesize that since Lisp is so niche, many who discover it
+   and use it regularly are dedicated enough developers to do lots of
+   open-source work. It may also be that the small community naturally improves
+   the quality of pull requests; there are only so many people who know this
+   library exists and those who do are sufficiently competent to intentionally
+   learn a 50 year-old programming language.
+<p>It must also be noted that Lisp has many libraries that few other languages
+   have. Due to the flexibility of the language, which will be detailed later,
+   it has extensions which add
+   <a href=https://github.com/CodyReichert/awesome-cl#non-deterministic-logic-programming>
+   logic programming</a>,
+   <a href=https://edicl.github.io/cl-who/>JSX-style HTML generation</a>,
+   <a href=https://parenscript.common-lisp.dev/>a web scripting language</a>,
+   <a href=https://github.com/guicho271828/trivia/>pattern matching</a>, and
+   <a href=https://edicl.github.io/cl-ppcre/>a fast regex compiler</a>.
+<p>It must thus be concluded that the Common Lisp language has a mature
+   ecosystem usable for a variety of projects. As an added benefit, Common Lisp
+   does not have an "official" package manager; while
+   <a href=https://www.quicklisp.org/beta/>QuickLisp</a> is the defacto
+   standard, it is also just as easy to use something like
+   <a href=https://github.com/fosskers/vend>Vend</a> to vendor your
+   dependencies if you are concerned about package manager supply chain
+   attacks.
+</section>
+<section>
+<header><h2>An Arsenal of Compilers</h2></header>
+<p>Common Lisp does not have an official implementation. It has an ANSI
+   standard that ensures different compilers and interpreters can all run
+   a certain subset of common functionality. Where the standard has gaps,
+   there have been defacto standards created by packages that bridge the
+   differences between implementations. Due to this, there are a variety
+   of notable implementations with excellent use-cases.
+<p>The fastest implementation is the compiler-only
+   <a href=https://www.sbcl.org/>Steel Bank Common Lisp (SBCL)</a>. It is very
+   performant and makes heavy use of type annotations when optimizing code. It 
+   compiles directly to machine code and has an incremental garbage collector.
+   Because of this speed, it is a good choice for servers.
+<p>Another notable implementation is the interpreter/compiler
+   <a href=https://ecl.common-lisp.dev/>Embeddable Common Lisp (ECL)</a>. It is
+   notable since its compiler translates Lisp code into C code. Because of
+   this, it is able to target any machine C can, practically everything. Due to
+   the transliteration, it is less performant than SBCL.
+<p>Another notable implementation is
+   <a href=https://abcl.org/>Armed Bear Common Lisp (ABCL)</a>. It compiles its
+   code into bytecode for the Java Virtual Machine, which allows it to
+   interoperate with Java programs and Java libraries effortlessly. If you work
+   in an enterprise shop where everything has to be connected to Java, this can
+   be pitched as a "fast scripting language" for rapidly prototyping concepts
+   or sketching out app internals.
+<p>We can now conclude that Common Lisp has quite a few compilers available to
+   ensure code runs on whatever platform in whatever manner you wish it to.
+   notably, there are seldom many tweaks and adjustments needed to make code
+   work between implementations unless you explicitly use
+   implementation-specific features such as ABCL's Java Interop or SBCL's
+   atomics. There are many more compilers and interpreters for this language,
+   but this assortment should give some scope to the reader.
+</section>
+<section>
+<header><h2>Unrivalled Metaprogramming</h2></header>
+<p>All the above features are nice, but those are things any language could
+   hypothetically have. The core feature that sets all lisp languages apart is
+   metaprogramming. This point will require some code examples to prove, so
+   please bear with me as I try to explain enough of Lisp that the argument is
+   cogent.
+<p>First, in Lisp, a function/operator call is in the form of
+   <code>(operator operand operand operand)</code> such as
+   <code>(+ 1 1) ; 2</code> or <code>(* 3 3 3) ; 27</code> (the semicolons are
+   comments). This notation works whether you're adding numbers, invoking 
+   loops, or making functions. The whole syntax is uniform that way. For
+   example, to make a linked list, you just write <code>(list 1 2 3 4)</code>.
+   If you're making more of a tree-like structure, you can just write:
+   <code>(list 1 2 (list 3 4 5) 6 "lists aren't all the same type")</code>.
+<p>Because Lisp programmers use a lot of linked lists when prototyping, there
+   is a shorthand for writing lists, the single-quote: <code>'(1 2 3 4 5)</code>.
+   For a tree: <code>'(1 2 3 (4 5) (6 7))</code>. Notice we didn't need more
+   single-quotes when we were writing the interior lists. The single quote
+   essentially switches on "data mode" for everything within the parentheses.
+   Now, compare these two: <code>'(+ 1 1)</code> and <code>(+ 1 1)</code>.
+   Lisp code is all linked-lists.
+<p>This similarity is inside the compiler too. At compile-time, the AST of
+   Lisp code internally is represented by the same kind of linked lists
+   that our code can use. Due to this, there are many things that can be
+   done via Common Lisp's macro system.
+<p>This isn't the best place to explain everything about macros. For that, I'd
+   recommend reading many of the legendary books that have been written about
+   Lisp. What I will do here is give an example of what can be done when code
+   is data. Suppose you want to create your own looping construct; you aren't
+   satisfied with the existing ones and want to make one that best fits your
+   use case. Here is how I would write a <code>while</code> loop construct
+   in Lisp (note that tagbody is essentially a locally-scoped set of goto tags).
+<figure>
+<pre><code>; definition
+(defmacro while (test &body body)
+  `(tagbody
+    begin
+      (when ,test
+        ,@body
+        (go begin))))
+
+; usage example
+(let ((num 0))
+  (while (< num 5)
+    (print num)
+    (incf num)))</code></pre>
+<figcaption>
+A custom while loop syntax in Lisp. The backtick is essentially a template
+language for building trees. The comma temporarily exits data mode to insert
+a value from an expression. The comma-at splices elements from a list into
+the one being built. The <code>let</code> macro creates a local variable and
+the <code>incf</code> macro increments a "place," in this case the variable
+num.
+</figcaption>
+</figure>
+<p>Besides creating new syntax, this is also helpful for creating DSLs inside
+   your codebase without introducing extra complexity. Your DSL gets translated
+   by macros into Lisp code that is compiled as normal. Well-thought use can
+   reduce complexity of a codebase.
+</section>
+<section>
+<header><h2>Conclusion</h2></header>
+<p>In conclusion, Lisp is worth using in the modern day because of its mature
+   ecosystem, arsenal of compilers, and unrivalled metaprogramming. It can
+   morph into whatever language best fits the problem if you take the time to
+   master it and learn to shape it. I currently use it for web development,
+   such as for my <a href=https://charito.flashcardsmobile.com>senior project
+   </a>. You may notice that the design is not that great. That's why I'm using
+   <a href=https://scrimba.com/?via=community>Scrimba</a> to teach myself UI
+   design with CSS for my next project.
+</section>
+<section>
+<header><h2>More Resources</h2></header>
+<p>To get a good overview of Lisp's other strengths, see Conrad Barksi's
+   <a href=http://landoflisp.com/>humorous promotional site</a> for his
+   <a href=https://nostarch.com/lisp.htm>introductory Lisp book</a>. The music
+   video is top-notch (<a href=https://www.youtube.com/watch?v=HM1Zb3xmvMc>
+   Direct YT Link</a>).
+<p>Barski is also creator of the "Lisp Alien" unofficial logo.
+<figure>
+<img src=https://upload.wikimedia.org/wikipedia/commons/6/64/Lisplogo_alien_256.png>
+<figcaption>What language has a better mascot?</figcaption>
+</figure>
+<p>Once you've completed Barski's work, I would recommend reading Paul Graham's
+   Lisp Book, <a href=https://www.paulgraham.com/onlisp.html>On Lisp</a>. He
+   also has many essays and musings about Lisp on his site, so check those out.
+   Notably, he made his own lisp dialect to create Hacker News.
+<figure>
+<a href=https://www.paulgraham.com/onlisp.html>
+<img src=https://s.turbifycdn.com/aah/paulgraham/on-lisp-26.gif>
+</a>
+<figcaption>
+  This book talks a lot more about macros. Just read the errata so you know
+  which stuff got changed once the language standardized (the book was
+  written) before the final standardization phase.
+</figcaption>
+</figure>
+<p>While Graham's work is good, he does differ from normal CL style in his
+   books. If you want to see a more standard CL code style and some more
+   application, see Peter Norvig's
+   <a href=http://norvig.com/paip.html>
+   Paradigms of Artificial Intelligence Programming.</a>
+<figure>
+  <a href=https://github.com/norvig/paip-lisp>
+  <img src=https://raw.githubusercontent.com/norvig/paip-lisp/refs/heads/main/paip-cover.png>
+  </a>
+  <figcaption>
+  The book covers good old-fashioned AI before LLMs ruined it all.
+  </figcaption>
+</figure>
+</section>
+</main>
+<footer>
+Copyright &copy; Peter Jackson Link, III.
+<p>
+This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+<p>
+This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+<p>
+You should have received a copy of the GNU General Public License along with this program. If not, see &lt;https://www.gnu.org/licenses/&gt;. 
+</footer>
